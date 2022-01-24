@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat App</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div id="root">
+    <div class="flex flex-col h-screen bg-gray-100">
+        <div class="grid place-items-center my-auto">
+            <h1 class="font-bold text-4xl pb-10 text-gray-900 antialiased">Chat App </h1>
+            <form class="flex w-full max-w-sm space-x-3 justify-center" id="joinForm" method="post" action="/login">
+                <div class="relative ">
+                    <input type="text" id="nickName" required name="userName"
+                           class=" rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+                           placeholder="Nickname">
+                </div>
+                <div class="relative ">
+                    <input type="password" id="password" required name="password"
+                           class="rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent"
+                           placeholder="Password">
+                </div>
+
+                <button class="flex-shrink-0 bg-green-400 text-gray-800 text-base font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-200"
+                        type="submit">Join
+                </button>
+            </form>
+            <a class="my-4 text-base text-gray-600 hover:text-gray-900" href="/register">Or register</a>
+        </div>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+
+</body>
+</html>
