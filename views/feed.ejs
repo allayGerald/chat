@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lets Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div id="root" x-data="">
+    <div class="flex w-screen main-chat lg:h-screen bg-gray-900 divide-solid">
+        <div style="position: fixed; z-index: 9999;"></div>
+        <div class="flex w-full lg:w-5/6 lg:h-5/6 lg:mx-auto lg:my-auto shadow-md">
+            <div class="hidden lg:block pl-4 pr-4 w-64 bg-purple-900 text-white">
+<!--                TODO fetch this dynamically-->
+                <p class="font-black my-4 text-xl"> #
+                Online: (2):</p>
+                <ul class="divide-y divide-gray-300 truncate">
+                    <% users.forEach(function(user) { %>
+                    <button class="block focus:outline-none truncate">
+                        <li class="w-full flex justify-start pl-1 py-2 hover:bg-purple-50 hover:text-black cursor-pointer ">
+                            <div class="flex items-center">
+                                <div class="block pr-2"><img alt="avatar"
+                                                             src="https://images.unsplash.com/photo-1494548162494-384bba4ab999?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                                                             class="rounded-full h-10 w-10 "></div>
+                                <p class="w-36 truncate text-left"></p></div>
+                        </li>
+                    </button>
+                        <% }); %>
+                </ul>
+            </div>
+            <div class="flex flex-col flex-grow lg:max-w-full bg-purple-50"><p
+                    class="font-black mt-4 mb-2 pl-4 lg:pl-8 text-2xl">Main Chat</p>
+                <section id="chatContainer" class="h-5/6 overflow-y-auto pl-4 lg:pl-8 pt-4 mb-2 lg:mb-0">
+                    <ul class="w-full lg:w-96" id="messagesList">
+                        <% messages.forEach(function(message) { %>
+                            <li>
+                                <p class="font-semibold text-base">
+                                    <%= message.user.userName %>
+                                    <span class="text-xm ml-2 opacity-75"><%= message.createdAt %></span>
+                                </p>
+                                <p class="text-base"><%= message.content %></p>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </section>
+                <form class="" id="chatForm">
+                    <div class="px-8">
+                        <select
+                                class="lg:hidden text-xs flex-1 appearance-none border border-gray-300 w-full py-2 px-1 lg:px-4 bg-white text-green-400 placeholder-gray-400 shadow-sm focus:outline-none"
+                                id="usersOn">
+                            <option value="" class="">Everyone</option>
+                            <% users.forEach(function(user) { %>
+                            <option value="<% user._id%>" class=""><% user.userName %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="w-full flex p-4 lg:p-8 bg-purple-50">
+                        <div class="flex relative w-full lg:w-5/6"><span
+                                class="rounded-l-md inline-flex items-center px-1 lg:px-3 border-t bg-white border-l border-b  border-gray-300 text-gray-500 shadow-sm text-sm"><p
+                                class="bg-purple-400 text-white text-xs lg:text-base font-normal rounded p-1">To: Everyone</p></span><input
+                                type="text"
+                                class="rounded-r-lg flex-1 appearance-none border border-gray-300 w-full py-2 px-1 lg:px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none"
+                                name="message" id="message" required></div>
+                        <div class="hidden lg:block w-1/6">
+                            <button type="submit" class="ml-8 flex-shrink-0 bg-green-400 text-gray-700 text-base font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2">
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+  const baseUrl = `http://localhost:3000`
+  window.onload = function () {
+    const container = document.getElementById('chatContainer')
+    const socket = io.connect(baseUrl)
+
+    const form = document.getElementById('chatForm')
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+
+      const message = document.getElementById('message')
+      const content = message.value
+
+      fetch(`/feed`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({content})
+      }).then(res => {
+        message.value = ''
+        message.focus()
+      }).catch(e => {
+        console.log(e)
+        alert('something went wrong please refresh page')
+      })
+    })
+
+    socket.on('message', message => {
+      onAddMessage(message)
+      container.scrollTop = container.scrollHeight
+    })
+
+    const onAddMessage = (message) => {
+      const messageList = document.getElementById('messagesList')
+      const li = document.createElement('li')
+      li.innerHTML = ` <p class="font-semibold text-base">${message.user}<span class="ml-2 opacity-75">${message.time}</span></p>
+                        <p class="text-sm">${message.message}</p>`
+      messageList.appendChild(li)
+    }
+
+  }
+</script>
+</body>
+</html>
